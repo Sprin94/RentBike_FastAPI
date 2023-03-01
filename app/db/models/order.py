@@ -18,9 +18,9 @@ class Order(Base):
         ForeignKey('bikes.number', ondelete="CASCADE"),
         nullable=False
     )
-    tenant_id = Column(
+    user_id = Column(
         Integer,
-        ForeignKey('tenants.id', ondelete="CASCADE"),
+        ForeignKey('users.id', ondelete="CASCADE"),
         nullable=False
     )
     date_begin = Column(
@@ -40,8 +40,8 @@ class Order(Base):
 
     status = Column(Enum(OrderStatus), default=OrderStatus)
 
-    bike = relationship('Bike', back_populates="orders", lazy=True)
-    tenant = relationship('Tenant', back_populates="orders", lazy=True)
+    bike = relationship('Bike', back_populates="orders")
+    tenant = relationship('User', back_populates="orders", lazy=True)
 
     __table_args__ = (
         CheckConstraint(

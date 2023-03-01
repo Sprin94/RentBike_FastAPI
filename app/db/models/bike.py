@@ -13,6 +13,7 @@ class BikeModel(Base):
     model = Column(VARCHAR(50), unique=True, index=True)
     engine_capacity = Column(Integer)
 
+    bikes = relationship('Bike', back_populates='model')
     __table_args__ = (
         UniqueConstraint(
             'brand',
@@ -42,9 +43,10 @@ class Bike(Base):
         UNAVAILABLE = 'unavailable'
 
     status = Column(Enum(BikeStatus), default=BikeStatus.AVAILABLE)
-    model = relationship('BikeModel', back_populates="bikes", lazy=True)
-    cost_per_day = Column(Integer)
 
+    cost_per_day = Column(Integer)
+    model = relationship('BikeModel', back_populates="bikes", lazy=True)
+    orders = relationship('Order', back_populates='bike')
     __table_args__ = (
         CheckConstraint(
             born_year > 0, name='check_born_year_positive'
