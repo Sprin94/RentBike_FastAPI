@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from sqlalchemy.ext.declarative import as_declarative, declared_attr
+from sqlalchemy.ext.declarative import declared_attr, as_declarative
 from sqlalchemy import Column, DateTime
 
 
-@as_declarative
+@as_declarative()
 class Base:
     created_at = Column(
         DateTime(timezone=True),
