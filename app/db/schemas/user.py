@@ -1,24 +1,30 @@
+сfrom datetime import date
 from typing import Optional
 
 from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
-    email: Optional[str] = None
-    is_active: Optional[bool] = False
+    email: Optional[str]
+    is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
 
 
 class UserBaseInDB(UserBase):
     id: int = None
+    name: str
+    surname: str
+    birth_day: Optional[date]
 
     class Config:
         orm_mode = True
 
 
-class UserCreate(UserBaseInDB):
+class UserCreate(BaseModel):
     email: str
     password: str
+    name: str
+    surname: str
 
 
 class UserUpdate(UserBaseInDB):
