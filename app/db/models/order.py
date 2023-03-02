@@ -38,13 +38,13 @@ class Order(Base):
         RESERVATION = 'reservation'
         CANCELLED = 'cancelled'
 
-    status = Column(Enum(OrderStatus), default=OrderStatus)
+    status = Column(Enum(OrderStatus), default=OrderStatus.RESERVATION)
 
     bike = relationship('Bike', back_populates="orders")
     tenant = relationship('User', back_populates="orders", lazy=True)
 
     __table_args__ = (
         CheckConstraint(
-            date_end > date_end, name='check_dates_positive'
+            date_end > date_begin, name='check_dates_positive'
         ),
     )
