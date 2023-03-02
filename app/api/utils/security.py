@@ -1,10 +1,6 @@
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
-from fastapi.security import (
-    OAuth2PasswordBearer,
-    SecurityScopes,
-)
-from pydantic import ValidationError
+from fastapi.security import OAuth2PasswordBearer
 
 from app.db.crud.user import UserCrud
 from app.core.jwt import ALGORITHM
@@ -12,49 +8,30 @@ from app.core.config import settings
 from app.db.schemas.token import TokenData
 from app.db.schemas.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="token",
-    scopes={
-        "me": "Read information about the current user.",
-    },
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_current_user(
-    security_scopes: SecurityScopes,
-    token: str = Depends(oauth2_scheme),
-    crud: UserCrud = Depends(),
-):
-    if security_scopes.scopes:
-        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
-    else:
-        authenticate_value = "Bearer"
+        token: str = Depends(oauth2_scheme),
+        crud: UserCrud = Depends(),
+        ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": authenticate_value},
+        headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[ALGORITHM]
-        )
-        email: str = payload.get("sub")
-        if email is None:
+        payload = jwt.decode(token,
+                             settings.SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
             raise credentials_exception
-        token_scopes = payload.get("scopes", [])
-        token_data = TokenData(scopes=token_scopes, email=email)
-    except (JWTError, ValidationError):
+        token_data = TokenData(username=username)
+    except JWTError:
         raise credentials_exception
-    user = await crud.get_by_email(token_data.email)
+    user = crud.get_by_email(email=token_data.email)
     if user is None:
         raise credentials_exception
-    for scope in security_scopes.scopes:
-        if scope not in token_data.scopes:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Not enough permissions",
-                headers={"WWW-Authenticate": authenticate_value},
-            )
     return user
 
 

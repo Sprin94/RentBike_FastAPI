@@ -10,4 +10,3 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Optional[EmailStr] = None
-    scopes: list[str] = []
