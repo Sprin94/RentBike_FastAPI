@@ -10,7 +10,7 @@ class BikeCrud(BaseCrud):
     async def get_all_bikes(self) -> list[Bike]:
         stmt = (select(Bike).join(BikeModel))
         result = await self.session.execute(stmt)
-        return result.all()
+        return result.scalars().all()
 
     async def create_bike(self, bike: BikeCreate) -> Bike:
         bike = Bike(**bike.dict())

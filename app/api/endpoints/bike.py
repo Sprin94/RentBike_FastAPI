@@ -7,7 +7,7 @@ from app.db.schemas.bike import BikeCreate, BikeInDB, BikeModelInDB, BikeModelCr
 router = APIRouter()
 
 
-@router.get('')
+@router.get('', response_model=list[BikeInDB])
 async def get_all_bike(crud: BikeCrud = Depends()):
     bikes = await crud.get_all_bikes()
     return bikes
