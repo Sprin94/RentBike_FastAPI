@@ -8,6 +8,7 @@ from app.core.config import settings
 from app.db.schemas.token import TokenData
 from app.db.schemas.user import User
 
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
@@ -22,14 +23,16 @@ async def get_current_user(
     )
     try:
         payload = jwt.decode(token,
-                             settings.SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+                             settings.SECRET_KEY,
+                             algorithms=[ALGORITHM]
+                             )
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenData(email=email)
     except JWTError:
         raise credentials_exception
-    user = crud.get_by_email(email=token_data.email)
+    user = await crud.get_by_email(email=token_data.email)
     if user is None:
         raise credentials_exception
     return user
