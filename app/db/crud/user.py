@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash, verify_password
 from app.db.crud.base import BaseCrud
 from app.db.models.user import User
 from app.db.schemas.user import UserCreate
@@ -25,4 +25,16 @@ class UserCrud(BaseCrud):
             await self.session.refresh(user)
         except IntegrityError:
             raise HTTPException(status_code=400, detail="User already exist.")
+        return user
+
+    async def authenticate_user(
+        self,
+        email: str,
+        password: str,
+    ) -> bool | User:
+        user = await self.get_by_email(email=email)
+        if not user:
+            return False
+        if not verify_password(password, user.hashed_password):
+            return False
         return user
