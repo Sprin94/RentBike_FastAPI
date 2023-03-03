@@ -32,13 +32,13 @@ class Order(Base):
         nullable=False
     )
 
-    class OrderStatus(enum.Enum):
-        ACTIVE = 'active'
-        COMPLETE = 'complete'
-        RESERVATION = 'reservation'
-        CANCELLED = 'cancelled'
+    class OrderStatus(str, enum.Enum):
+        active = 'active'
+        complete = 'complete'
+        reservation = 'reservation'
+        cancelled = 'cancelled'
 
-    status = Column(Enum(OrderStatus), default=OrderStatus.RESERVATION)
+    status = Column(Enum(OrderStatus), default=OrderStatus.reservation)
 
     bike = relationship('Bike', back_populates="orders")
     tenant = relationship('User', back_populates="orders", lazy=True)

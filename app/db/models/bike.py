@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import (Column, UUID, VARCHAR, Integer, UniqueConstraint,
+from sqlalchemy import (Column, VARCHAR, Integer, UniqueConstraint,
                         CheckConstraint, ForeignKey, Enum,)
 from sqlalchemy.orm import relationship
 
@@ -39,10 +39,10 @@ class Bike(Base):
     photo = Column(VARCHAR(250))
 
     class BikeStatus(enum.Enum):
-        AVAILABLE = 'available'
-        UNAVAILABLE = 'unavailable'
+        available = 'available'
+        unavailable = 'unavailable'
 
-    status = Column(Enum(BikeStatus), default=BikeStatus.AVAILABLE)
+    status = Column(Enum(BikeStatus), default=BikeStatus.available)
 
     cost_per_day = Column(Integer)
     model = relationship('BikeModel', back_populates="bikes", lazy=True)
