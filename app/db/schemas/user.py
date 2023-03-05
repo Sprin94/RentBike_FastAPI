@@ -27,8 +27,11 @@ class UserCreate(BaseModel):
     surname: str
 
 
-class UserUpdate(UserBaseInDB):
-    password: Optional[str] = None
+class UserUpdate(BaseModel):
+    password: str = None
+    name: str = None
+    surname: str = None
+    birth_day: date = None
 
 
 class User(UserBaseInDB):
