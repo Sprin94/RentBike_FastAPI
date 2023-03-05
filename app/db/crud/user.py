@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, update, delete
 from sqlalchemy.exc import IntegrityError
 
 from app.core.security import get_password_hash, verify_password
@@ -38,3 +38,33 @@ class UserCrud(BaseCrud):
         if not verify_password(password, user.hashed_password):
             return False
         return user
+
+    async def update_user(
+            self,
+            email: str,
+            data: dict
+    ):
+        password = data.get('password')
+        if password:
+            dict.pop('password')
+            data['hashed_password'] = get_password_hash(password)
+        stmt = (update(User)
+                .where(User.email == email)
+                .values(**data)
+                .returning(User)
+                )
+        try:
+            result = await self.session.execute(stmt)
+            await self.session.commit()
+            return result.scalar()
+        except IntegrityError:
+            return False
+
+    async def delete_user(self,
+                          user_id: int):
+        model = await self.session.get(User, user_id)
+        if model:
+            self.session.delete(model)
+            await self.session.commit()
+            return True
+        raise HTTPException(status_code=404, detail="User not found.")

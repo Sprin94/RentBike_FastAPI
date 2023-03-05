@@ -1,16 +1,22 @@
-from sqlalchemy import select
+from uuid import UUID
 
+from sqlalchemy import select, update
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from app.db.crud.base import BaseCrud
 from app.db.models.order import Order
 from app.db.models.user import User
-from app.db.models import user, bike
 from app.db.schemas.order import OrderCreate
 
 
 class OrderCrud(BaseCrud):
-    async def get_all_order(self) -> list[Order]:
-        stmt = (select(Order).join(bike.Bike).join(user.User))
+    async def get_orders(self, status: str | None) -> list[Order]:
+        stmt = (select(Order)
+                .options(joinedload(Order.bike))
+                )
+        if status:
+            stmt = stmt.where(Order.status == status)
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
@@ -22,3 +28,16 @@ class OrderCrud(BaseCrud):
         await self.session.commit()
         await self.session.refresh(order)
         return order
+
+    async def update_order(self, uuid: UUID, order: OrderCreate):
+        stmt = (update(Order)
+                .where(Order.uuid == uuid)
+                .values(**order.dict())
+                .returning(Order))
+        try:
+            result = await self.session.execute(stmt)
+            await self.session.commit()
+            await self.session.refresh(result)
+            return result
+        except UnmappedInstanceError:
+            return False
