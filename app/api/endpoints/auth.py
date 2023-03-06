@@ -7,7 +7,7 @@ from app.core.jwt import create_access_token, verify_token_for_activate
 from app.db.schemas.token import Token
 from app.db.schemas.user import UserCreate, UserBaseInDB
 from app.db.crud.user import UserCrud
-from app.core.email import send_mail_registration
+from app.tasks.tasks import task_send_mail_registration
 from app.api.response_schemas import ResponseSignUp
 
 
@@ -43,11 +43,10 @@ async def user_registration(
 ):
     user = await crud.create_user(user)
     token = create_access_token({'email': user.email, 'status': 'new'})
-    # await send_mail_registration(
-    #     user.email,
-    #     token,
-    # )
-    print(token)
+    task_send_mail_registration.delay(
+        user.email,
+        token,
+    )
     return {'user': user,
             'message': 'Confirm your mail'}
 

@@ -46,7 +46,7 @@ class UserCrud(BaseCrud):
     ):
         password = data.get('password')
         if password:
-            dict.pop('password')
+            data.pop('password')
             data['hashed_password'] = get_password_hash(password)
         stmt = (update(User)
                 .where(User.email == email)

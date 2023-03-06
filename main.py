@@ -8,7 +8,7 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
 )
 app.include_router(user.router, prefix='/users', tags=['Users'])
-app.include_router(auth.router, prefix='/auth', tags=['Token'])
+app.include_router(auth.router, prefix='/auth', tags=['Auth'])
 app.include_router(bike.router, prefix='/bikes', tags=['Bike'])
 app.include_router(order.router, prefix='/orders', tags=['Order'])
 
@@ -18,4 +18,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print(settings.SECRET_KEY)
     main()
