@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.db.crud.bike import BikeCrud, BikeModelCrud
@@ -7,9 +9,23 @@ from app.db.schemas.bike import BikeCreate, BikeInDB, BikeModelInDB, BikeModelCr
 router = APIRouter()
 
 
+# @router.get('', response_model=list[BikeInDB])
+# async def get_all_bike(crud: BikeCrud = Depends()):
+#     bikes = await crud.get_all_bikes()
+#     return bikes
+
+
 @router.get('', response_model=list[BikeInDB])
-async def get_all_bike(crud: BikeCrud = Depends()):
-    bikes = await crud.get_all_bikes()
+async def get_available_bike(
+    date_rent_start: date,
+    date_rent_finish: date,
+    model: str,
+    crud: BikeCrud = Depends()
+):
+    bikes = await crud.get_available_bikes(
+        date_rent_start,
+        date_rent_finish,
+        model)
     return bikes
 
 

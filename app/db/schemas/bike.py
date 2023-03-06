@@ -33,9 +33,14 @@ class BikeCreate(BikeBase):
         orm_mode = True
 
 
-class BikeInDB(BikeBase):
+class BikeInDB(BaseModel):
+    number: str
+    color: str
+    born_year: int
+    mileage: int
+    cost_per_day: int
+    model: str
     photo: str | None = None
-    status: Enum
 
     class Config:
         orm_mode = True

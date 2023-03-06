@@ -1,10 +1,12 @@
 from uuid import UUID
 
+from fastapi import HTTPException, Depends
 from sqlalchemy import select, update
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from app.db.crud.base import BaseCrud
+from app.db.crud.bike import BikeCrud
 from app.db.models.order import Order
 from app.db.models.user import User
 from app.db.schemas.order import OrderCreate
@@ -20,7 +22,8 @@ class OrderCrud(BaseCrud):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def create_order(self, order: OrderCreate, user: User) -> Order:
+    async def create_order(self, order: OrderCreate, user: User,
+                           bike_crud: BikeCrud) -> Order:
         order_dict = order.dict()
         order_dict['user_id'] = user.id
         order = Order(**order_dict)
@@ -28,6 +31,7 @@ class OrderCrud(BaseCrud):
         await self.session.commit()
         await self.session.refresh(order)
         return order
+        raise HTTPException(status_code=400, detail="No bikes available")
 
     async def update_order(self, uuid: UUID, order: OrderCreate):
         stmt = (update(Order)
