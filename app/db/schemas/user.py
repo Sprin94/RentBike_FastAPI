@@ -1,7 +1,8 @@
 from datetime import date
 from typing import Optional
+import re
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class UserBase(BaseModel):
@@ -26,12 +27,30 @@ class UserCreate(BaseModel):
     name: str
     surname: str
 
+    @validator('password')
+    def password_correct(cls, value):
+        pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)' \
+                  r'(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$'
+
+        if value and re.match(pattern, value) is None:
+            raise ValueError('Password has incorrect format.')
+        return value
+
 
 class UserUpdate(BaseModel):
     password: str = None
     name: str = None
     surname: str = None
     birth_day: date = None
+
+    @validator('password')
+    def password_correct(cls, value):
+        pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)' \
+                  r'(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$'
+
+        if value and re.match(pattern, value) is None:
+            raise ValueError('Password has incorrect format.')
+        return value
 
 
 class User(UserBaseInDB):
