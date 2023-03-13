@@ -41,5 +41,5 @@ async def update_me(
 
     user = await crud.update_user(
         email=current_user.email,
-        data=data.dict(exclude_none=True))
+        data=data)
     return user

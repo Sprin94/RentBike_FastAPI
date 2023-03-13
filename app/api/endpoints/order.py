@@ -33,7 +33,7 @@ async def get_orders(
     return result
 
 
-@router.patch('/update/{id}')
+@router.patch('/{id}')
 async def update_order(
     order_uuid: UUID,
     order: OrderCreate,

@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from app.core.security import get_password_hash, verify_password
 from app.db.crud.base import BaseCrud
 from app.db.models.user import User
-from app.db.schemas.user import UserCreate
+from app.db.schemas.user import UserCreate, UserUpdate
 
 
 class UserCrud(BaseCrud):
@@ -42,8 +42,9 @@ class UserCrud(BaseCrud):
     async def update_user(
             self,
             email: str,
-            data: dict
+            data: UserUpdate
     ):
+        data = data.dict(exclude_none=True)
         password = data.get('password')
         if password:
             data.pop('password')
