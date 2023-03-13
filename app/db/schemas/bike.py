@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import Optional
+
+from fastapi import File, UploadFile
 
 from pydantic import BaseModel
 
@@ -24,10 +27,21 @@ class BikeBase(BaseModel):
     born_year: int
     mileage: int = 0
     cost_per_day: int
+    photo: Optional[str] = None
 
 
 class BikeCreate(BikeBase):
     pass
+
+    class Config:
+        orm_mode = True
+
+
+class BikeUpdate(BaseModel):
+    color: Optional[str] = None
+    mileage: Optional[int] = None
+    cost_per_day: Optional[int] = None
+    photo: Optional[UploadFile] = File(None)
 
     class Config:
         orm_mode = True
@@ -40,7 +54,7 @@ class BikeInDB(BaseModel):
     mileage: int
     cost_per_day: int
     model: str
-    photo: str | None = None
+    photo: Optional[UploadFile] = None
 
     class Config:
         orm_mode = True
