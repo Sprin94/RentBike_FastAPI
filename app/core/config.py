@@ -11,8 +11,9 @@ class Settings(BaseSettings):
     BASE_DIR: str = os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         )
-    TEMPLATES_DIR: str = os.path.join(BASE_DIR, 'templates')
-
+    TEMPLATES_DIR: str = 'templates'
+    MEDIA_DIR: str = 'media'
+    DIRS = ('bikes_photo',)
     HOST: str = 'localhost'
     PORT: int = 80
 
